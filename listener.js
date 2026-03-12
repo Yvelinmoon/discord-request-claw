@@ -405,13 +405,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         // 标记用户已提交
         _submittedUsers.add(interaction.user.id);
         
-        // 立即回复用户
-        await interaction.reply({
-          embeds: [buildSuccessEmbed()],
-          ephemeral: true,
-        });
-        
-        // 后台异步处理
+        // 后台异步处理（提前到回复之前，确保一定会执行）
         setImmediate(() => {
           handleSubmissionBackground(
             interaction.user.id,
@@ -420,7 +414,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
             qq
           );
         });
-        console.log('[表单] 已回复用户，后台处理中...');
+        console.log('[表单] 已提交，后台处理中...');
+        
+        // 立即回复用户
+        try {
+          await interaction.reply({
+            embeds: [buildSuccessEmbed()],
+            ephemeral: true,
+          });
+        } catch (e) {
+          console.log('[表单] 回复失败（可能已过期）:', e.message);
+          // 即使回复失败，后台处理已经执行，不影响飞书写入
+        }
       }
       return;
     }

@@ -121,7 +121,7 @@ async function getSheetId(token) {
   });
 }
 
-async function feishuAddRecord(netaUsername, qq, discordUsername) {
+async function feishuAddRecord(netaUsername, phone, qq, discordUsername) {
   const token = await getFeishuTenantToken();
   if (!token) return;
   
@@ -131,9 +131,10 @@ async function feishuAddRecord(netaUsername, qq, discordUsername) {
   return new Promise((resolve) => {
     const body = JSON.stringify({
       valueRange: {
-        range: `${sheetId}!A:D`,
+        range: `${sheetId}!A:E`,
         values: [[
           netaUsername,
+          phone,
           qq,
           discordUsername,
           new Date().toISOString().slice(0, 19).replace('T', ' '),
@@ -177,13 +178,13 @@ async function feishuAddRecord(netaUsername, qq, discordUsername) {
 }
 
 // ─── Background Task ──────────────────────────────────────────────────
-async function handleSubmissionBackground(userId, userMention, netaUsername, qq) {
+async function handleSubmissionBackground(userId, userMention, netaUsername, phone, qq) {
   /** 提交后台处理：写飞书 + 推送工作频道 + 赋予角色 */
   
-  console.log('[后台处理] 开始处理表单提交:', { userId, netaUsername, qq });
+  console.log('[后台处理] 开始处理表单提交:', { userId, netaUsername, phone, qq });
   
   // 1. 写飞书
-  await feishuAddRecord(netaUsername, qq, userMention);
+  await feishuAddRecord(netaUsername, phone, qq, userMention);
   
   // 2. 通知管理员频道
   if (STAFF_CHANNEL_ID) {
@@ -195,12 +196,13 @@ async function handleSubmissionBackground(userId, userMention, netaUsername, qq)
           : '';
         
         const embed = new EmbedBuilder()
-          .setTitle('🦞 新素体领取记录')
+          .setTitle('🦞 新虾宝领取记录')
           .setColor(0xFF6B35)
           .setTimestamp()
           .addFields(
             { name: 'Discord 用户', value: userMention, inline: true },
             { name: '捏 Ta 用户名', value: netaUsername, inline: true },
+            { name: '注册手机号', value: phone, inline: true },
             { name: 'QQ 号码', value: qq, inline: false }
           )
           .setFooter({ text: `用户 ID: ${userId}` });
@@ -272,6 +274,14 @@ function createNetaModal() {
     .setMaxLength(50)
     .setRequired(true);
 
+  const phoneInput = new TextInputBuilder()
+    .setCustomId('phone')
+    .setLabel('捏 Ta 注册手机号')
+    .setPlaceholder('填写捏 Ta 注册手机号，用于关联账号信息')
+    .setStyle(TextInputStyle.Short)
+    .setMaxLength(20)
+    .setRequired(true);
+
   const qqInput = new TextInputBuilder()
     .setCustomId('qq')
     .setLabel('你的 QQ 号码')
@@ -281,9 +291,10 @@ function createNetaModal() {
     .setRequired(true);
 
   const row1 = new ActionRowBuilder().addComponents(netaUsernameInput);
-  const row2 = new ActionRowBuilder().addComponents(qqInput);
+  const row2 = new ActionRowBuilder().addComponents(phoneInput);
+  const row3 = new ActionRowBuilder().addComponents(qqInput);
 
-  modal.addComponents(row1, row2);
+  modal.addComponents(row1, row2, row3);
 
   return modal;
 }
@@ -398,9 +409,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
         
         const netaUsername = interaction.fields.getTextInputValue('neta_username');
+        const phone = interaction.fields.getTextInputValue('phone');
         const qq = interaction.fields.getTextInputValue('qq');
         
-        console.log('[表单提交]', { netaUsername, qq, user: interaction.user.tag });
+        console.log('[表单提交]', { netaUsername, phone, qq, user: interaction.user.tag });
         
         // 标记用户已提交
         _submittedUsers.add(interaction.user.id);
@@ -411,6 +423,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             interaction.user.id,
             `<@${interaction.user.id}>`,
             netaUsername,
+            phone,
             qq
           );
         });

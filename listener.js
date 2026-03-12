@@ -121,7 +121,7 @@ async function getSheetId(token) {
   });
 }
 
-async function feishuAddRecord(netaUsername, phone, qq, discordUsername) {
+async function feishuAddRecord(netaUsername, phone, discordUsername) {
   const token = await getFeishuTenantToken();
   if (!token) return;
   
@@ -131,11 +131,10 @@ async function feishuAddRecord(netaUsername, phone, qq, discordUsername) {
   return new Promise((resolve) => {
     const body = JSON.stringify({
       valueRange: {
-        range: `${sheetId}!A:E`,
+        range: `${sheetId}!A:D`,
         values: [[
           netaUsername,
           phone,
-          qq,
           discordUsername,
           new Date().toISOString().slice(0, 19).replace('T', ' '),
         ]],
@@ -178,13 +177,13 @@ async function feishuAddRecord(netaUsername, phone, qq, discordUsername) {
 }
 
 // ─── Background Task ──────────────────────────────────────────────────
-async function handleSubmissionBackground(userId, userMention, netaUsername, phone, qq) {
+async function handleSubmissionBackground(userId, userMention, netaUsername, phone) {
   /** 提交后台处理：写飞书 + 推送工作频道 + 赋予角色 */
   
-  console.log('[后台处理] 开始处理表单提交:', { userId, netaUsername, phone, qq });
+  console.log('[后台处理] 开始处理表单提交:', { userId, netaUsername, phone });
   
   // 1. 写飞书
-  await feishuAddRecord(netaUsername, phone, qq, userMention);
+  await feishuAddRecord(netaUsername, phone, userMention);
   
   // 2. 通知管理员频道
   if (STAFF_CHANNEL_ID) {
@@ -202,8 +201,7 @@ async function handleSubmissionBackground(userId, userMention, netaUsername, pho
           .addFields(
             { name: 'Discord 用户', value: userMention, inline: true },
             { name: '捏 Ta 用户名', value: netaUsername, inline: true },
-            { name: '注册手机号', value: phone, inline: true },
-            { name: 'QQ 号码', value: qq, inline: false }
+            { name: '注册手机号', value: phone, inline: false }
           )
           .setFooter({ text: `用户 ID: ${userId}` });
         
@@ -254,8 +252,8 @@ function buildSuccessEmbed() {
   return new EmbedBuilder()
     .setTitle('🦞 虾宝领取成功！')
     .setDescription(
-      '你虾宝正在孵化中，降生后将主动联络你。\n' +
-      '孵化成功后将向您发送discord消息...'
+      '你的虾宝已找到，正在快马加鞭送来的路上～\n' +
+      '请保持联络畅通，虾宝马上就到！'
     )
     .setColor(0xFF6B35);
 }
@@ -375,7 +373,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         // 检查用户是否已提交过
         if (_submittedUsers.has(interaction.user.id)) {
           await interaction.reply({
-            content: '🦞 你的虾宝正在孵化中，请耐心等待降临哦～',
+            content: '🦞 你的虾宝已在安排中，请等待接收哦～',
             ephemeral: true,
           });
           console.log('[按钮] 用户已提交，提示等待:', interaction.user.tag);
@@ -402,34 +400,33 @@ client.on(Events.InteractionCreate, async (interaction) => {
         
         const netaUsername = interaction.fields.getTextInputValue('neta_username');
         const phone = interaction.fields.getTextInputValue('phone');
-        const qq = interaction.fields.getTextInputValue('qq');
         
-        console.log('[表单提交]', { netaUsername, phone, qq, user: interaction.user.tag });
+        console.log('[表单提交]', { netaUsername, phone, user: interaction.user.tag });
         
         // 标记用户已提交
         _submittedUsers.add(interaction.user.id);
         
-        // 后台异步处理（提前到回复之前，确保一定会执行）
+        // 先确认交互（防止过期）
+        await interaction.deferReply({ ephemeral: true });
+        
+        // 后台异步处理
         setImmediate(() => {
           handleSubmissionBackground(
             interaction.user.id,
             `<@${interaction.user.id}>`,
             netaUsername,
-            phone,
-            qq
+            phone
           );
         });
         console.log('[表单] 已提交，后台处理中...');
         
-        // 立即回复用户
+        // 回复用户
         try {
-          await interaction.reply({
+          await interaction.editReply({
             embeds: [buildSuccessEmbed()],
-            ephemeral: true,
           });
         } catch (e) {
-          console.log('[表单] 回复失败（可能已过期）:', e.message);
-          // 即使回复失败，后台处理已经执行，不影响飞书写入
+          console.log('[表单] 回复失败:', e.message);
         }
       }
       return;
@@ -442,7 +439,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         // 检查用户是否已提交过
         if (_submittedUsers.has(interaction.user.id)) {
           await interaction.reply({
-            content: '🦞 你的虾宝正在孵化中，请耐心等待降临哦～',
+            content: '🦞 你的虾宝已在安排中，请等待接收哦～',
             ephemeral: true,
           });
           console.log('[命令] 用户已提交，提示等待:', interaction.user.tag);

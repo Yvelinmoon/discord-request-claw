@@ -44,6 +44,9 @@ if (!TOKEN || !GUILD_ID) {
 const _seenInteractions = new Set();
 const MAX_SEEN_SIZE = 500;
 
+// 记录已提交用户（防止重复提交）
+const _submittedUsers = new Set();
+
 // ─── Helpers ──────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -366,8 +369,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
     // 按钮点击
     if (interaction.isButton()) {
       if (interaction.customId === 'open_neta_form') {
-        await interaction.showModal(createNetaModal());
-        console.log('[按钮] 已显示 Modal');
+        // 检查用户是否已提交过
+        if (_submittedUsers.has(interaction.user.id)) {
+          await interaction.reply({
+            content: '🦞 你的虾宝正在孵化中，请耐心等待降临哦～',
+            ephemeral: true,
+          });
+          console.log('[按钮] 用户已提交，提示等待:', interaction.user.tag);
+        } else {
+          await interaction.showModal(createNetaModal());
+          console.log('[按钮] 已显示 Modal');
+        }
       }
       return;
     }
@@ -389,6 +401,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const qq = interaction.fields.getTextInputValue('qq');
         
         console.log('[表单提交]', { netaUsername, qq, user: interaction.user.tag });
+        
+        // 标记用户已提交
+        _submittedUsers.add(interaction.user.id);
         
         // 立即回复用户
         await interaction.reply({
@@ -414,8 +429,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isChatInputCommand()) {
       if (interaction.commandName === '申请虾宝') {
         console.log('[命令]', interaction.commandName, interaction.user.tag);
-        await interaction.showModal(createNetaModal());
-        console.log('[命令] 已显示 Modal');
+        // 检查用户是否已提交过
+        if (_submittedUsers.has(interaction.user.id)) {
+          await interaction.reply({
+            content: '🦞 你的虾宝正在孵化中，请耐心等待降临哦～',
+            ephemeral: true,
+          });
+          console.log('[命令] 用户已提交，提示等待:', interaction.user.tag);
+        } else {
+          await interaction.showModal(createNetaModal());
+          console.log('[命令] 已显示 Modal');
+        }
       }
       return;
     }

@@ -241,21 +241,21 @@ function buildWelcomeEmbed() {
   return new EmbedBuilder()
     .setTitle('🦞 欢迎登录 Neta 宇宙')
     .setDescription(
-      '你的龙虾素体正在等待激活。\n\n' +
-      '填写以下信息，系统将为你匹配专属素体。\n' +
+      '一只虾宝正在等待收养...\n\n' +
+      '填写以下信息，系统将为你匹配一只虾宝。\n' +
       '龙虾降生后，我们会第一时间主动联络你——\n' +
-      '**请确保联系方式畅通，别让你的龙虾等太久。**'
+      '****'
     )
     .setColor(0xFF6B35)
-    .setFooter({ text: 'Neta 宇宙 · 龙虾素体领取通道' });
+    .setFooter({ text: 'Neta 宇宙 · 龙虾宝宝领取通道' });
 }
 
 function buildSuccessEmbed() {
   return new EmbedBuilder()
-    .setTitle('🦞 素体领取成功！')
+    .setTitle('🦞 虾宝领取成功！')
     .setDescription(
-      '你的龙虾正在孵化中，降生后将主动联络你。\n' +
-      '请保持联系方式畅通，静候佳音。'
+      '你虾宝正在孵化中，降生后将主动联络你。\n' +
+      '孵化成功后将向您发送discord消息...'
     )
     .setColor(0xFF6B35);
 }
@@ -268,8 +268,8 @@ function createNetaModal() {
 
   const netaUsernameInput = new TextInputBuilder()
     .setCustomId('neta_username')
-    .setLabel('你的完整捏 Ta 用户名')
-    .setPlaceholder('填写你在捏 Ta 的完整用户名')
+    .setLabel('你的捏 Ta 用户名')
+    .setPlaceholder('填写你在捏 Ta 的用户名')
     .setStyle(TextInputStyle.Short)
     .setMaxLength(50)
     .setRequired(true);
@@ -282,19 +282,11 @@ function createNetaModal() {
     .setMaxLength(20)
     .setRequired(true);
 
-  const qqInput = new TextInputBuilder()
-    .setCustomId('qq')
-    .setLabel('你的 QQ 号码')
-    .setPlaceholder('龙虾降生后我们会通过 QQ 联系你')
-    .setStyle(TextInputStyle.Short)
-    .setMaxLength(20)
-    .setRequired(true);
 
   const row1 = new ActionRowBuilder().addComponents(netaUsernameInput);
   const row2 = new ActionRowBuilder().addComponents(phoneInput);
-  const row3 = new ActionRowBuilder().addComponents(qqInput);
 
-  modal.addComponents(row1, row2, row3);
+  modal.addComponents(row1, row2);
 
   return modal;
 }
@@ -304,7 +296,7 @@ function createWelcomeView() {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('open_neta_form')
-      .setLabel('领取我的龙虾素体')
+      .setLabel('领取我的龙虾宝宝')
       .setStyle(ButtonStyle.Primary)
       .setEmoji('🦞')
   );
@@ -348,7 +340,7 @@ client.once(Events.ClientReady, async (c) => {
     console.error('   请检查 GUILD_ID 是否正确，Bot 是否在服务器中');
   }
   
-  console.log('\n💡 现在可以在 Discord 中使用 /申请龙虾 测试功能');
+  console.log('\n💡 现在可以在 Discord 中使用 /申请虾宝 测试功能');
 });
 
 // ─── Member Join Event ────────────────────────────────────────────────

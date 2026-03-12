@@ -1,8 +1,8 @@
 {
   "name": "neta-lobster-claim",
   "version": "1.0.0",
-  "description": "Neta 龙虾素体领取 - Discord Bot for Neta Universe",
-  "main": "index.js",
+  "description": "Neta 龙虾虾宝领取 - Discord Bot",
+  "main": "listener.js",
   "scripts": {
     "start": "node listener.js",
     "register": "node register-commands.js"

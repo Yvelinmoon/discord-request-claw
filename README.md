@@ -1,17 +1,16 @@
 # discord-bot-neta
 
-🦞 Discord Bot for Neta Universe - 龙虾素体领取机器人
+🦞 Discord Bot for Neta Universe - 龙虾宝宝领取机器人
 
 基于原 Python 项目重构的 Node.js 版本，使用 discord.js v14 实现。
 
 ## ✨ 功能特性
 
 - **自动欢迎** - 新用户加入服务器时自动发送私信欢迎消息
-- **Modal 表单** - 收集用户信息（捏 Ta 用户名、QQ 号码）
+- **Modal 表单** - 收集用户信息（捏 Ta 用户名、注册手机号码）
 - **飞书集成** - 自动写入飞书多维表格
 - **管理员通知** - 实时推送到管理员频道
-- **角色赋予** - 自动赋予已验证用户角色（可选）
-- **斜杠命令** - `/申请龙虾` 和 `/发送表单`
+- **斜杠命令** - `/申请虾宝`
 
 ## 📦 安装
 
@@ -72,15 +71,14 @@ npm start
 
 | 命令 | 说明 | 权限 |
 |------|------|------|
-| `/申请龙虾` | 领取你的龙虾宝宝 | 所有用户 |
-| `/发送表单` | 管理员测试：直接打开表单 | 管理员 |
+| `/申请虾宝` | 领取你的龙虾宝宝 | 所有用户 |
 
 ## 📊 飞书表格结构
 
 | 列 | 内容 |
 |----|------|
 | A | 捏 Ta 用户名 |
-| B | QQ 号码 |
+| B | 注册手机号 |
 | C | Discord 用户 |
 | D | 提交时间 |
 
@@ -125,7 +123,7 @@ discord-bot-neta/
 |--------|------|------|
 | `DISCORD_BOT_TOKEN` | Discord Bot Token | ✅ |
 | `DISCORD_GUILD_ID` | 服务器 ID | ✅ |
-| `DISCORD_STAFF_CHANNEL_ID` | 管理员通知频道 ID | ✅ |
+| `DISCORD_STAFF_CHANNEL_ID` | 管理员通知频道 ID | ❌ |
 | `DISCORD_VERIFIED_ROLE_ID` | 已验证角色 ID | ❌ |
 | `DISCORD_NOTIFY_ROLE_ID` | 通知角色 ID | ❌ |
 | `FEISHU_APP_ID` | 飞书应用 ID | ❌ |

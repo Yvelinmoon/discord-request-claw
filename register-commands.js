@@ -19,13 +19,8 @@ if (!TOKEN || !GUILD_ID) {
 
 const commands = [
   {
-    name: '领取素体',
-    description: '领取你的 Neta 龙虾素体',
-  },
-  {
-    name: '发送表单',
-    description: '管理员测试：直接打开素体领取表单',
-    default_member_permissions: '8', // 管理员权限
+    name: '申请虾宝',
+    description: '领取你的龙虾宝宝',
   },
 ];
 

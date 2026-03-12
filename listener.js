@@ -318,13 +318,8 @@ client.once(Events.ClientReady, async (c) => {
     const guild = await client.guilds.fetch(GUILD_ID);
     const commands = [
       {
-        name: '申请龙虾',
+        name: '申请虾宝',
         description: '领取你的龙虾宝宝',
-      },
-      {
-        name: '发送表单',
-        description: '管理员测试：直接打开素体领取表单',
-        defaultMemberPermissions: '8', // 管理员权限位
       },
     ];
     
@@ -417,7 +412,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     
     // 斜杠命令
     if (interaction.isChatInputCommand()) {
-      if (interaction.commandName === '申请龙虾' || interaction.commandName === '发送表单') {
+      if (interaction.commandName === '申请虾宝') {
         console.log('[命令]', interaction.commandName, interaction.user.tag);
         await interaction.showModal(createNetaModal());
         console.log('[命令] 已显示 Modal');
